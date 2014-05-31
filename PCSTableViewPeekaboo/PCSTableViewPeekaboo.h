@@ -10,6 +10,7 @@
 @interface PCSTableViewPeekaboo : NSObject
 
 @property (nonatomic, weak) UITableView *tableView;
+@property (nonatomic, assign) UITableViewRowAnimation rowAnimation; // defaults to UITableViewRowAnimationAutomatic
 
 // Setup
 - (void)addLogicalSection:(NSInteger)logicalSection numberOfRows:(NSInteger)numberOfRows;

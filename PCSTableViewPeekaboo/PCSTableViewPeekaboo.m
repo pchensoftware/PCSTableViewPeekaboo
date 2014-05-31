@@ -19,6 +19,7 @@
 
 - (id)init {
    if ((self = [super init])) {
+      self.rowAnimation = UITableViewRowAnimationAutomatic;
       self.logicalRowsPerSection = [NSMutableArray array];
       self.logicalSectionsWithSomethingHidden = [NSMutableIndexSet indexSet];
       self.hiddenLogicalIndexPathsBySection = [NSMutableDictionary dictionary];
@@ -65,7 +66,7 @@
    NSMutableIndexSet *hiddenLogicalIndexPaths = self.hiddenLogicalIndexPathsBySection[@(logicalIndexPath.section)];
    [hiddenLogicalIndexPaths addIndex:logicalIndexPath.row];
    
-   [self.tableView deleteRowsAtIndexPaths:@[ displayedIndexPath ] withRowAnimation:UITableViewRowAnimationAutomatic];
+   [self.tableView deleteRowsAtIndexPaths:@[ displayedIndexPath ] withRowAnimation:self.rowAnimation];
 }
 
 - (void)insertAllHiddenCells {
@@ -79,7 +80,7 @@
    [self.logicalSectionsWithSomethingHidden removeAllIndexes];
    [self.hiddenLogicalIndexPathsBySection removeAllObjects];
    [self.completelyHiddenLogicalSections removeAllIndexes];
-   [self.tableView insertRowsAtIndexPaths:logicalIndexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
+   [self.tableView insertRowsAtIndexPaths:logicalIndexPaths withRowAnimation:self.rowAnimation];
 }
 
 //====================================================================================================
