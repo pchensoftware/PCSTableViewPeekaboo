@@ -32,7 +32,9 @@ typedef NS_ENUM(int, Sections) {
 - (void)viewDidLoad {
    [super viewDidLoad];
    self.title = @"Peekaboo";
+   self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Show All" style:UIBarButtonItemStyleDone target:self action:@selector(_showAllButtonTapped)];
    
+   self.peekaboo.tableView = self.tableView;
    [self.peekaboo addLogicalSection:Section_One numberOfRows:1];
    [self.peekaboo addLogicalSection:Section_Two numberOfRows:2];
    [self.peekaboo addLogicalSection:Section_Three numberOfRows:3];
@@ -64,12 +66,16 @@ typedef NS_ENUM(int, Sections) {
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+   [self.peekaboo deleteDisplayedIndexPath:indexPath];
+   [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 //====================================================================================================
 #pragma mark - Events
 //====================================================================================================
 
-
+- (void)_showAllButtonTapped {
+   [self.peekaboo insertAllHiddenCells];
+}
 
 @end

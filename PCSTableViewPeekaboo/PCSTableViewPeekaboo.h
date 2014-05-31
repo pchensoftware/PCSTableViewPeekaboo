@@ -11,10 +11,16 @@
 
 @property (nonatomic, weak) UITableView *tableView;
 
-- (void)addLogicalSection:(NSInteger)section numberOfRows:(NSInteger)numberOfRows;
+// Setup
+- (void)addLogicalSection:(NSInteger)logicalSection numberOfRows:(NSInteger)numberOfRows;
 - (NSInteger)numberOfDisplayedSections;
-- (NSInteger)numberOfDisplayedRowsInSection:(NSInteger)section;
+- (NSInteger)numberOfDisplayedRowsInSection:(NSInteger)displayedSection;
 
+// Insert and delete
+- (void)deleteDisplayedIndexPath:(NSIndexPath *)logicalIndexPath;
+- (void)insertAllHiddenCells;
+
+// Convert
 - (NSIndexPath *)logicalFromDisplayedIndexPath:(NSIndexPath *)displayedIndexPath;
 - (NSInteger)logicalFromDisplayedSection:(NSInteger)displayedSection;
 - (NSIndexPath *)displayedFromLogicalIndexPath:(NSIndexPath *)displayedIndexPath;
