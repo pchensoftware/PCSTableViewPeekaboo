@@ -69,7 +69,17 @@
 }
 
 - (void)insertAllHiddenCells {
+   NSMutableArray *logicalIndexPaths = [NSMutableArray array];
+   [self.hiddenLogicalIndexPathsBySection enumerateKeysAndObjectsUsingBlock:^(NSNumber *logicalSectionNumber, NSIndexSet *hiddenLogicalIndexPathsBySection, BOOL *stop) {
+      [hiddenLogicalIndexPathsBySection enumerateIndexesUsingBlock:^(NSUInteger index, BOOL *stop) {
+         [logicalIndexPaths addObject:[NSIndexPath indexPathForRow:index inSection:[logicalSectionNumber integerValue]]];
+      }];
+   }];
    
+   [self.logicalSectionsWithSomethingHidden removeAllIndexes];
+   [self.hiddenLogicalIndexPathsBySection removeAllObjects];
+   [self.completelyHiddenLogicalSections removeAllIndexes];
+   [self.tableView insertRowsAtIndexPaths:logicalIndexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
 }
 
 //====================================================================================================
@@ -77,13 +87,14 @@
 //====================================================================================================
 
 - (NSIndexPath *)logicalFromDisplayedIndexPath:(NSIndexPath *)displayedIndexPath {
-   NSUInteger logicalSection = [self logicalIndexFromPhysicalIndex:displayedIndexPath.section hiddenIndexSet:self.completelyHiddenLogicalSections];
+   NSUInteger logicalSection = [self logicalFromDisplayedSection:displayedIndexPath.section];
    NSUInteger logicalRow = [self logicalIndexFromPhysicalIndex:displayedIndexPath.row hiddenIndexSet:self.hiddenLogicalIndexPathsBySection[@(logicalSection)]];
    return [NSIndexPath indexPathForRow:logicalRow inSection:logicalSection];
 }
 
 - (NSInteger)logicalFromDisplayedSection:(NSInteger)displayedSection {
-   return displayedSection;
+   NSUInteger logicalSection = [self logicalIndexFromPhysicalIndex:displayedSection hiddenIndexSet:self.completelyHiddenLogicalSections];
+   return logicalSection;
 }
 
 - (NSIndexPath *)displayedFromLogicalIndexPath:(NSIndexPath *)displayedIndexPath {
