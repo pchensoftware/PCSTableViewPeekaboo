@@ -36,6 +36,10 @@
    [self.logicalRowsPerSection addObject:@(numberOfRows)];
 }
 
+- (void)setupDeleteLogicalSection:(NSInteger)logicalSection {
+   [self.completelyHiddenLogicalSections addIndex:logicalSection];
+}
+
 - (NSInteger)numberOfDisplayedSections {
    return [self.logicalRowsPerSection count] - [self.completelyHiddenLogicalSections count];
 }
@@ -133,6 +137,23 @@
    [self.hiddenLogicalIndexPathsBySection removeAllObjects];
    [self.completelyHiddenLogicalSections removeAllIndexes];
    [self.tableView insertRowsAtIndexPaths:logicalIndexPaths withRowAnimation:self.rowAnimation];
+}
+
+- (void)reloadLogicalSection:(NSInteger)logicalSection {
+   NSInteger displayedSection = [self displayedFromLogicalSection:logicalSection];
+   [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:displayedSection] withRowAnimation:self.rowAnimation];
+}
+
+- (void)reloadLogicalSections:(NSIndexSet *)logicalSections {
+   NSMutableIndexSet *displayedSections = [NSMutableIndexSet indexSet];
+   [logicalSections enumerateIndexesUsingBlock:^(NSUInteger logicalSection, BOOL *stop) {
+      if ([self.completelyHiddenLogicalSections containsIndex:logicalSection])
+         return;
+      
+      NSInteger displayedSection = [self displayedFromLogicalSection:logicalSection];
+      [displayedSections addIndex:displayedSection];
+   }];
+   [self.tableView reloadSections:displayedSections withRowAnimation:self.rowAnimation];
 }
 
 //====================================================================================================

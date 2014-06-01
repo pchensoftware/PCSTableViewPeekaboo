@@ -14,6 +14,7 @@
 
 // Setup
 - (void)setupAddLogicalSection:(NSInteger)logicalSection numberOfRows:(NSInteger)numberOfRows;
+- (void)setupDeleteLogicalSection:(NSInteger)logicalSection;
 - (NSInteger)numberOfDisplayedSections;
 - (NSInteger)numberOfDisplayedRowsInSection:(NSInteger)displayedSection;
 
@@ -24,6 +25,8 @@
 - (void)insertLogicalSection:(NSInteger)logicalSection;
 - (void)insertLogicalSections:(NSIndexSet *)logicalSections;
 - (void)insertAllHiddenCells;
+- (void)reloadLogicalSection:(NSInteger)logicalSection;
+- (void)reloadLogicalSections:(NSIndexSet *)logicalSections;
 
 // Convert
 - (NSIndexPath *)logicalFromDisplayedIndexPath:(NSIndexPath *)displayedIndexPath;
