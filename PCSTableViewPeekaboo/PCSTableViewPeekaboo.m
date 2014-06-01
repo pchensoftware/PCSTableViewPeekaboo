@@ -32,7 +32,7 @@
 #pragma mark - Setup
 //====================================================================================================
 
-- (void)addLogicalSection:(NSInteger)logicalSection numberOfRows:(NSInteger)numberOfRows {
+- (void)setupAddLogicalSection:(NSInteger)logicalSection numberOfRows:(NSInteger)numberOfRows {
    [self.logicalRowsPerSection addObject:@(numberOfRows)];
 }
 

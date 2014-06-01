@@ -13,7 +13,7 @@
 @property (nonatomic, assign) UITableViewRowAnimation rowAnimation; // defaults to UITableViewRowAnimationAutomatic
 
 // Setup
-- (void)addLogicalSection:(NSInteger)logicalSection numberOfRows:(NSInteger)numberOfRows;
+- (void)setupAddLogicalSection:(NSInteger)logicalSection numberOfRows:(NSInteger)numberOfRows;
 - (NSInteger)numberOfDisplayedSections;
 - (NSInteger)numberOfDisplayedRowsInSection:(NSInteger)displayedSection;
 
