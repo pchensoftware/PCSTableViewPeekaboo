@@ -47,7 +47,8 @@
       return [self.logicalRowsPerSection[logicalSection] integerValue] - [hiddenLogicalIndexPaths count];
    }
    else {
-      return [self.logicalRowsPerSection[displayedSection] integerValue];
+      NSInteger logicalSection = [self logicalFromDisplayedSection:displayedSection];
+      return [self.logicalRowsPerSection[logicalSection] integerValue];
    }
 }
 
@@ -69,6 +70,57 @@
    [self.tableView deleteRowsAtIndexPaths:@[ displayedIndexPath ] withRowAnimation:self.rowAnimation];
 }
 
+- (void)deleteLogicalSection:(NSInteger)logicalSection {
+   if ([self.completelyHiddenLogicalSections containsIndex:logicalSection])
+      return;
+   
+   NSInteger displayedSection = [self displayedFromLogicalSection:logicalSection];
+   [self.completelyHiddenLogicalSections addIndex:logicalSection];
+   [self.tableView deleteSections:[NSIndexSet indexSetWithIndex:displayedSection] withRowAnimation:self.rowAnimation];
+}
+
+- (void)deleteLogicalSections:(NSIndexSet *)logicalSections {
+   NSMutableIndexSet *displayedSections = [NSMutableIndexSet indexSet];
+   
+   [logicalSections enumerateIndexesUsingBlock:^(NSUInteger logicalSection, BOOL *stop) {
+      if ([self.completelyHiddenLogicalSections containsIndex:logicalSection])
+         return;
+      
+      NSInteger displayedSection = [self displayedFromLogicalSection:logicalSection];
+      [displayedSections addIndex:displayedSection];
+   }];
+   
+   [self.completelyHiddenLogicalSections addIndexes:logicalSections];
+   [self.tableView deleteSections:displayedSections withRowAnimation:self.rowAnimation];
+}
+
+- (void)insertLogicalSection:(NSInteger)logicalSection {
+   if (! [self.completelyHiddenLogicalSections containsIndex:logicalSection])
+      return;
+   
+   NSInteger displayedSection = [self displayedFromLogicalSection:logicalSection];
+   [self.completelyHiddenLogicalSections removeIndex:logicalSection];
+   [self.tableView insertSections:[NSIndexSet indexSetWithIndex:displayedSection] withRowAnimation:self.rowAnimation];
+}
+
+- (void)insertLogicalSections:(NSIndexSet *)logicalSections {
+   NSMutableIndexSet *displayedSections = [NSMutableIndexSet indexSet];
+   __block NSInteger i = 0;
+   
+   [logicalSections enumerateIndexesUsingBlock:^(NSUInteger logicalSection, BOOL *stop) {
+      if (! [self.completelyHiddenLogicalSections containsIndex:logicalSection])
+         return;
+      
+      NSInteger displayedSection = [self displayedFromLogicalSection:logicalSection];
+      NSInteger displayedSectionToInsert = displayedSection + i;
+      [displayedSections addIndex:displayedSectionToInsert];
+      i++;
+   }];
+   
+   [self.completelyHiddenLogicalSections removeIndexes:logicalSections];
+   [self.tableView insertSections:displayedSections withRowAnimation:self.rowAnimation];
+}
+
 - (void)insertAllHiddenCells {
    NSMutableArray *logicalIndexPaths = [NSMutableArray array];
    [self.hiddenLogicalIndexPathsBySection enumerateKeysAndObjectsUsingBlock:^(NSNumber *logicalSectionNumber, NSIndexSet *hiddenLogicalIndexPathsBySection, BOOL *stop) {
@@ -88,21 +140,24 @@
 //====================================================================================================
 
 - (NSIndexPath *)logicalFromDisplayedIndexPath:(NSIndexPath *)displayedIndexPath {
-   NSUInteger logicalSection = [self logicalFromDisplayedSection:displayedIndexPath.section];
-   NSUInteger logicalRow = [self logicalIndexFromPhysicalIndex:displayedIndexPath.row hiddenIndexSet:self.hiddenLogicalIndexPathsBySection[@(logicalSection)]];
+   NSInteger logicalSection = [self logicalFromDisplayedSection:displayedIndexPath.section];
+   NSInteger logicalRow = [self logicalIndexFromPhysicalIndex:displayedIndexPath.row hiddenIndexSet:self.hiddenLogicalIndexPathsBySection[@(logicalSection)]];
    return [NSIndexPath indexPathForRow:logicalRow inSection:logicalSection];
 }
 
 - (NSInteger)logicalFromDisplayedSection:(NSInteger)displayedSection {
-   NSUInteger logicalSection = [self logicalIndexFromPhysicalIndex:displayedSection hiddenIndexSet:self.completelyHiddenLogicalSections];
+   NSInteger logicalSection = [self logicalIndexFromPhysicalIndex:displayedSection hiddenIndexSet:self.completelyHiddenLogicalSections];
    return logicalSection;
 }
 
-- (NSIndexPath *)displayedFromLogicalIndexPath:(NSIndexPath *)displayedIndexPath {
-   return displayedIndexPath;
+- (NSIndexPath *)displayedFromLogicalIndexPath:(NSIndexPath *)logicalIndexPath {
+   NSInteger displayedSection = [self displayedFromLogicalSection:logicalIndexPath.section];
+   NSInteger displayedRow = logicalIndexPath.row;
+   return [NSIndexPath indexPathForRow:displayedRow inSection:displayedSection];
 }
 
-- (NSInteger)displayedFromLogicalSection:(NSInteger)displayedSection {
+- (NSInteger)displayedFromLogicalSection:(NSInteger)logicalSection {
+   NSInteger displayedSection = [self displayedIndexFromLogicalIndex:logicalSection hiddenIndexSet:self.completelyHiddenLogicalSections];
    return displayedSection;
 }
 
@@ -110,8 +165,8 @@
 #pragma mark - Utils
 //====================================================================================================
 
-- (NSInteger)logicalIndexFromPhysicalIndex:(NSUInteger)physicalIndex hiddenIndexSet:(NSIndexSet *)indexSet {
-   if ([indexSet count] == 0)
+- (NSInteger)logicalIndexFromPhysicalIndex:(NSUInteger)physicalIndex hiddenIndexSet:(NSIndexSet *)hiddenIndexSet {
+   if ([hiddenIndexSet count] == 0)
       return physicalIndex;
    
    NSInteger logicalIndex = 0;
@@ -119,9 +174,15 @@
    //for (logicalIndex=0, hiddenCount=-1; logicalIndex - hiddenCount < physicalIndex; logicalIndex++) {
    for (NSInteger logicalI=0; logicalI - hiddenCount <= physicalIndex; logicalI++) {
       logicalIndex = logicalI;
-      hiddenCount = [indexSet countOfIndexesInRange:NSMakeRange(0, logicalI + 1)];
+      hiddenCount = [hiddenIndexSet countOfIndexesInRange:NSMakeRange(0, logicalI + 1)];
    }
    return logicalIndex;
+}
+
+- (NSInteger)displayedIndexFromLogicalIndex:(NSUInteger)logicalIndex hiddenIndexSet:(NSIndexSet *)hiddenIndexSet {
+   NSInteger numHiddenIndeces = [hiddenIndexSet countOfIndexesInRange:NSMakeRange(0, logicalIndex)];
+   NSInteger displayedIndex = logicalIndex - numHiddenIndeces;
+   return displayedIndex;
 }
 
 @end

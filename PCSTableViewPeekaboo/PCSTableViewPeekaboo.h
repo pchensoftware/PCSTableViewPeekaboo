@@ -18,13 +18,17 @@
 - (NSInteger)numberOfDisplayedRowsInSection:(NSInteger)displayedSection;
 
 // Insert and delete
-- (void)deleteDisplayedIndexPath:(NSIndexPath *)logicalIndexPath;
+- (void)deleteDisplayedIndexPath:(NSIndexPath *)displayedIndexPath;
+- (void)deleteLogicalSection:(NSInteger)logicalSection;
+- (void)deleteLogicalSections:(NSIndexSet *)logicalSections;
+- (void)insertLogicalSection:(NSInteger)logicalSection;
+- (void)insertLogicalSections:(NSIndexSet *)logicalSections;
 - (void)insertAllHiddenCells;
 
 // Convert
 - (NSIndexPath *)logicalFromDisplayedIndexPath:(NSIndexPath *)displayedIndexPath;
 - (NSInteger)logicalFromDisplayedSection:(NSInteger)displayedSection;
-- (NSIndexPath *)displayedFromLogicalIndexPath:(NSIndexPath *)displayedIndexPath;
-- (NSInteger)displayedFromLogicalSection:(NSInteger)displayedSection;
+- (NSIndexPath *)displayedFromLogicalIndexPath:(NSIndexPath *)logicalIndexPath;
+- (NSInteger)displayedFromLogicalSection:(NSInteger)logicalSection;
 
 @end
